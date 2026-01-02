@@ -16,22 +16,29 @@ This project aims to develop a machine learning model that accurately predicts h
  - catboost
  - gunicorn
  
- # Getting Started
-This is make you understand how you may give instructions on setting up your project locally. To get a local copy up and running follow these simple example steps.
+## Getting Started
+Follow these steps to run the backend locally.
 
 1. Clone the repo
 
 ```
-git clone https://github.com/KalyanMurapaka45/Spam-Email-Detection.git
+git clone https://github.com/projectsportfolio75-coder/House-Price-Prediction.git
+cd House-Price-Prediction
 ```
 
-2. Install the required libraries
+2. Install dependencies
 
 ```
 pip install -r requirements.txt
 ```
 
-3. Open and execute .ipynb file (After complete Execution you will get a .pkl file for project Deployment)
+3. Run the Flask app
+
+```
+python3 app.py
+```
+
+By default the app listens on port 5000. For production, Render will use the `web: gunicorn app:app` command from the existing `Procfile`.
 
 # Dataset Description
 
@@ -71,7 +78,14 @@ A CatBoostRegressor model is trained using the preprocessed dataset. The model i
 
 # Model Deployment
 
-This project includes a Flask-based web application for deploying the house price prediction model. The model is loaded from the saved pickle file ('housepred.pkl'), and the scaler object is loaded from 'scaler.pkl' for preprocessing the input data. The web application allows users to input the necessary features of a house through a form or API request, and it returns the predicted house price.
+This project includes a Flask-based web application for deploying the house price prediction model. The model is loaded from the saved pickle file (`housepred.pkl`), and the scaler object is loaded from `scaler.pkl` for preprocessing the input data. The web application allows users to input the necessary features of a house through a form or API request, and it returns the predicted house price.
+
+Deployment notes:
+
+- Render: The included `Procfile` starts `gunicorn app:app`. Ensure the `housepred.pkl` and `scaler.pkl` files are present in the repo or set `MODEL_PATH`/`SCALER_PATH` environment variables in Render.
+- Vercel (frontend): Create a Next.js app in the `frontend/` directory and connect it to this backend's `/predict_api` endpoint.
+ - Keep `templates/` and `housepred.pkl`/`scaler.pkl`.
+ - Large training artifacts (not required for deployment) can be removed using `scripts/cleanup_artifacts.sh`.
 
 # Contributing
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.

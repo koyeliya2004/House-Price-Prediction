@@ -1,34 +1,49 @@
+import os
+import sys
 import pickle
-from flask import Flask,request,app,jsonify,url_for,render_template
+from flask import Flask, request, jsonify, render_template
 import numpy as np
-import pandas as pd
+
+# Compatibility shim: some pickled models reference private sklearn symbols
+# (e.g. '_passthrough_scorer') from older scikit-learn versions. Ensure
+# the attribute exists before unpickling so loading doesn't fail.
+try:
+    import sklearn.metrics._scorer as _sk_scorer
+    if not hasattr(_sk_scorer, '_passthrough_scorer'):
+        def _passthrough_scorer(estimator, X, y, *args, **kwargs):
+            try:
+                return estimator.score(X, y)
+            except Exception:
+                return 0.0
+
+        _sk_scorer._passthrough_scorer = _passthrough_scorer
+except Exception:
+    # If sklearn isn't available or has a different layout, continue and
+    # allow errors to be handled when loading the model.
+    pass
 
 app = Flask(__name__)
-model = pickle.load(open('housepred.pkl','rb'))
-scaler = pickle.load(open('scaler.pkl','rb'))
 
-@app.route('/')
-def home():
-    return render_template('home.html')
+# Load model files with graceful errors so deploy logs show helpful messages
+MODEL_PATH = os.environ.get('MODEL_PATH', 'housepred.pkl')
+SCALER_PATH = os.environ.get('SCALER_PATH', 'scaler.pkl')
 
-@app.route('/predict_api',methods=['POST'])
-def predict_api():
-    data = request.json['data']
-    print(data)
-    a_data = (np.array(list(data.values())).reshape(1,-1))
-    new_data = scaler.transform(a_data)
-    output = model.predict(new_data)
-    print(output[0])
-    return jsonify(output[0])
+try:
+    with open(MODEL_PATH, 'rb') as fh:
+        model = pickle.load(fh)
+except Exception as e:
+    print(f"ERROR: failed to load model from {MODEL_PATH}: {e}")
+    model = None
 
-@app.route('/predict',methods=['POST'])
-def predict():
-    data=[float(x) for x in request.form.values()]
-    final_input=scaler.transform(np.array(data).reshape(1,-1))
-    print(final_input)
-    output=model.predict(final_input)[0]
-    return render_template("home.html",prediction_text="The House price prediction is {}".format(output))
+try:
+    with open(SCALER_PATH, 'rb') as fh:
+        scaler = pickle.load(fh)
+except Exception as e:
+    print(f"ERROR: failed to load scaler from {SCALER_PATH}: {e}")
+    scaler = None
 
-
-if __name__ =="__main__":
-    app.run(debug=True)
+# If CatBoostRegressor from the pickled model lacks sklearn tags (older versions),
+# add a compatible __sklearn_tags__ to avoid sklearn utilities failing at runtime.
+try:
+    import catboost
+    from run import app
