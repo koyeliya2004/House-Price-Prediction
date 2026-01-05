@@ -32,6 +32,19 @@ def home():
     return render_template('home.html')
 
 
+@bp.route('/health')
+def health():
+    """Health check endpoint for Render deployment"""
+    model = current_app.model
+    scaler = current_app.scaler
+    status = 'healthy' if model is not None and scaler is not None else 'unhealthy'
+    return jsonify({
+        'status': status,
+        'model_loaded': model is not None,
+        'scaler_loaded': scaler is not None
+    }), 200 if status == 'healthy' else 503
+
+
 @bp.route('/predict_api', methods=['POST'])
 def predict_api():
     model = current_app.model

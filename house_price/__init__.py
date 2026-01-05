@@ -1,10 +1,14 @@
 import os
 import pickle
 from flask import Flask
+from flask_cors import CORS
 
 
 def create_app(config=None):
     app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '..', 'templates'))
+    
+    # Enable CORS for frontend at localhost:3000
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}})
 
     # load config
     MODEL_PATH = os.environ.get('MODEL_PATH', os.path.join(os.path.dirname(__file__), '..', 'housepred.pkl'))

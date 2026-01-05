@@ -3,7 +3,7 @@ import sys
 import pickle
 from flask import Flask, request, jsonify, render_template
 import numpy as np
-
+from flask_cors import CORS
 # Compatibility shim: some pickled models reference private sklearn symbols
 # (e.g. '_passthrough_scorer') from older scikit-learn versions. Ensure
 # the attribute exists before unpickling so loading doesn't fail.
@@ -23,7 +23,7 @@ except Exception:
     pass
 
 app = Flask(__name__)
-
+CORS(app)
 # Load model files with graceful errors so deploy logs show helpful messages
 MODEL_PATH = os.environ.get('MODEL_PATH', 'housepred.pkl')
 SCALER_PATH = os.environ.get('SCALER_PATH', 'scaler.pkl')
@@ -46,4 +46,24 @@ except Exception as e:
 # add a compatible __sklearn_tags__ to avoid sklearn utilities failing at runtime.
 try:
     import catboost
-    from run import app
+    if model and hasattr(model, '__sklearn_tags__') is False:
+        def _sklearn_tags(self):
+            return {}
+        if hasattr(catboost.CatBoostRegressor, '__sklearn_tags__') is False:
+            catboost.CatBoostRegressor.__sklearn_tags__ = _sklearn_tags
+except Exception:
+    pass
+
+# Import routes from the blueprints
+from house_price.routes import bp
+
+app.register_blueprint(bp)
+
+# Attach model and scaler to app for easy access from routes
+app.model = model
+app.scaler = scaler
+
+if __name__ == "__main__":
+    # For development, run with Flask development server
+    # For production, use gunicorn: gunicorn -w 4 -b 0.0.0.0:5000 app:app
+    app.run(debug=True, host="0.0.0.0", port=5000)

@@ -1,0 +1,17 @@
+# Render Blueprint for Flask Backend
+# Deploy to Render: https://render.com
+
+services:
+  - type: web
+    name: house-price-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.4"
+      - key: MODEL_PATH
+        value: housepred.pkl
+      - key: SCALER_PATH
+        value: scaler.pkl
+    healthCheckPath: /health
