@@ -1,7 +1,8 @@
-# Render Blueprint for Flask Backend
+# Render Blueprint for Flask Backend + Next.js Frontend
 # Deploy to Render: https://render.com
 
 services:
+  # Flask API Backend
   - type: web
     name: house-price-api
     runtime: python
@@ -15,3 +16,16 @@ services:
       - key: SCALER_PATH
         value: scaler.pkl
     healthCheckPath: /health
+
+  # Next.js Frontend (Optional - can also deploy to Vercel)
+  - type: web
+    name: house-price-frontend
+    runtime: node
+    rootDir: web
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NEXT_PUBLIC_API_URL
+        value: https://house-price-api.onrender.com
