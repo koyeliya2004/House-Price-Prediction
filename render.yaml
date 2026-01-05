@@ -4,7 +4,7 @@
 services:
   # Flask API Backend
   - type: web
-    name: house-price-api
+    name: house-price-prediction-h8ie
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
@@ -17,15 +17,15 @@ services:
         value: scaler.pkl
     healthCheckPath: /health
 
-  # Next.js Frontend (Optional - can also deploy to Vercel)
+  # Next.js Frontend
   - type: web
     name: house-price-frontend
     runtime: node
     rootDir: web
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --legacy-peer-deps && npm run build
     startCommand: npm run start
     envVars:
       - key: NODE_VERSION
         value: "20"
       - key: NEXT_PUBLIC_API_URL
-        value: https://house-price-api.onrender.com
+        value: https://house-price-prediction-h8ie.onrender.com
