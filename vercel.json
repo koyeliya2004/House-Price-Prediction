@@ -1,0 +1,10 @@
+{
+  "framework": "nextjs",
+  "rootDirectory": "web",
+  "installCommand": "cd web && npm install --legacy-peer-deps",
+  "buildCommand": "cd web && npm run build",
+  "outputDirectory": "web/.next",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://house-price-prediction-h8ie.onrender.com"
+  }
+}
