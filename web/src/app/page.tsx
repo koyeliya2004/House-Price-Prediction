@@ -151,24 +151,7 @@ const HomePage = () => {
               <span className="text-emerald-400">housing market.</span>
             </h2>
 
-            <p className={`max-w-xl text-lg md:text-xl font-medium leading-relaxed mb-12 ${isDayMode ? "text-slate-700" : "text-white/60"}`}>
-              Built on the classic Boston Housing dataset with 13 features, this UI keeps you focused on the model—not global listings.
-            </p>
 
-            {/* Search Bar */}
-            <div className={`flex flex-wrap items-center gap-6 rounded-[2rem] p-4 lg:p-6 max-w-5xl backdrop-blur-3xl shadow-2xl ${isDayMode ? "bg-white/80 border border-slate-200 text-slate-900" : "bg-black/40 border border-white/10"}`}>
-              <SearchField placeholder="Per-capita crime (CRIM)" isDayMode={isDayMode} />
-              <Divider isDayMode={isDayMode} />
-              <SearchField placeholder="Avg rooms (RM)" isDayMode={isDayMode} />
-              <Divider isDayMode={isDayMode} />
-              <SearchField placeholder="Tax rate (TAX)" isDayMode={isDayMode} />
-              <Divider isDayMode={isDayMode} />
-              <SearchField placeholder="Pupil-teacher ratio (PTRATIO)" isDayMode={isDayMode} />
-
-              <button className="ml-auto w-full md:w-auto rounded-2xl bg-emerald-400 text-black px-10 py-4 font-black text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all shadow-xl shadow-emerald-400/20 active:scale-95">
-                Search now
-              </button>
-            </div>
           </div>
         </div>
       </section>
